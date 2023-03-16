@@ -75,26 +75,24 @@ class TopLevelFeatureExtractor(extractors.FeatureExtractor):
 
     def extract(self, domain_path, instance_path):
         all_features = {}
-
         sas_representation_dir = None
 
         for extractor in self.extractors:
             start_time = time.time()
 
-            try:
-                if extractor.requires_sas_representation:
-                    extractor.sas_representation_dir = sas_representation_dir
+            # try:
+            if extractor.requires_sas_representation:
+                extractor.sas_representation_dir = sas_representation_dir
+            successful,features = extractor.extract(domain_path, instance_path)
+            end_time = time.time()
 
-                successful,features = extractor.extract(domain_path, instance_path)
-                end_time = time.time()
-
-                if extractor.creates_sas_representation:
-                    sas_representation_dir = extractor.sas_representation_dir
-            except:
-                successful = False
-                features = extractor.default_features()
-                end_time = time.time()
-
+            if extractor.creates_sas_representation:
+                sas_representation_dir = extractor.sas_representation_dir
+            # except:
+            #     assert False, extractor
+            #     successful = False
+            #     features = extractor.default_features()
+            #     end_time = time.time()
             all_features.update(features)
 
             elapsed = end_time-start_time
@@ -113,7 +111,7 @@ def export_features_csv(features, print_header=True, output_file=sys.stdout):
     # features is a dictionary {instance : {feature_name:feature_value}}
 
     sorted_feature_names = None
-    for instance,instance_features in features.iteritems():
+    for instance,instance_features in features.items():
         if sorted_feature_names == None:
             sorted_feature_names = sorted(instance_features.keys())
 
@@ -130,7 +128,7 @@ def export_features_json(features, output_file=sys.stdout):
     print("    \"instance_features\": {", file=output_file)
 
     count_instances = 0
-    for instance, instance_features in features.iteritems():
+    for instance, instance_features in features.items():
         print("        \"%s\": {" % instance, file=output_file)
 
         sorted_features = sorted(instance_features.keys())

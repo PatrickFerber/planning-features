@@ -17,11 +17,11 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from feature_extractor import FeatureExtractor
+from .feature_extractor import FeatureExtractor
 
-import pddl
-from pddl import conditions
-from pddl import f_expression
+from . import pddl
+from .pddl import conditions
+from .pddl import f_expression
 
 class SimplePDDLFeatureExtractor(FeatureExtractor):
     def __init__(self, args):
@@ -117,11 +117,11 @@ class SimplePDDLFeatureExtractor(FeatureExtractor):
             features.update(pddl_features)
 
             # make sure at least one non-sentinel value, otherwise obviously not successful
-            for key,value in features.iteritems():
+            for key,value in features.items():
                 if value != self.sentinel_value:
                     successful = True
         except Exception as e:
-            print "Exception running simple_pddl extraction: %s" % (str(e))
+            print("Exception running simple_pddl extraction: %s" % (str(e)))
 
         return successful,features
 
@@ -180,8 +180,8 @@ class SimplePDDLFeatureExtractor(FeatureExtractor):
                         elif isinstance(part, conditions.ExistentialCondition):
                             num_parts += 1
                         else:
-                            print "ERROR: Found a part that wasn't an atom... precondition parsing impossible"
-                            print part
+                            print("ERROR: Found a part that wasn't an atom... precondition parsing impossible")
+                            print(part)
                             die
 
                 total_parts += num_parts
@@ -223,8 +223,8 @@ class SimplePDDLFeatureExtractor(FeatureExtractor):
                         num_parts += 1
                         num_negations += 1
                     else:
-                        print "Found an effect with a literal that wasn't Atom or NegatedAtom. Need to die."
-                        print effect.literal
+                        print("Found an effect with a literal that wasn't Atom or NegatedAtom. Need to die.")
+                        print(effect.literal)
                         die
 
                 if min_predicates_per_effect == None or min_predicates_per_effect > num_parts:
@@ -268,8 +268,8 @@ class SimplePDDLFeatureExtractor(FeatureExtractor):
         elif isinstance(task.goal, conditions.NegatedAtom):
             num_goals = 1
         else:
-            print "Goal wasn't a conjunctive condition. Need to die!"
-            print task.goal
+            print("Goal wasn't a conjunctive condition. Need to die!")
+            print(task.goal)
             die
 
         pddl_features['pddlNumGoals'] = num_goals
@@ -292,8 +292,8 @@ class SimplePDDLFeatureExtractor(FeatureExtractor):
             elif isinstance(condition, f_expression.FunctionAssignment):
                 num_function_assignments += 1
             else:
-                print "Unexpected initial condition that wasn't Atom or NegatedAtom. Need to die!"
-                print condition.dump()
+                print("Unexpected initial condition that wasn't Atom or NegatedAtom. Need to die!")
+                print(condition.dump())
                 die
 
         pddl_features['pddlNumInitialConditions'] = num_initial_conditions

@@ -104,7 +104,6 @@
 State lcurrent_goals;
 
 
-
 /* search space for EHC
  */
 EhcNode *lehc_space_head, *lehc_space_end, *lehc_current_start, *lehc_current_end;

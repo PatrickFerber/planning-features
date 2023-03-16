@@ -20,7 +20,7 @@ CONFIGURATION= -DLBD -DREPRTHREE -DWEIGHTS #-DFUIP #-DMULTICORE #-DSPREAD -DCOST
 #LINKFEATURES= -fopenmp
 
 # The following options are specific to GCC. Disable when necessary (e.g. in OS X).
-GCCOPTIMIZE= $(ARCH) -O3 -fprefetch-loop-arrays -funroll-loops -ftree-loop-im -ftracer -maccumulate-outgoing-args -momit-leaf-frame-pointer #-falign-functions=64
+GCCOPTIMIZE= $(ARCH) -fcommon -O3 -fprefetch-loop-arrays -funroll-loops -ftree-loop-im -ftracer -maccumulate-outgoing-args -momit-leaf-frame-pointer #-falign-functions=64
 
 CFLAGS = $(VERSION) $(FEATURES) $(CONFIGURATION) $(INSTRUMENT) $(GCCOPTIMIZE) -Wall
 

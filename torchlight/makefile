@@ -11,7 +11,7 @@ ADDONS	=
 
 CC      = gcc
 
-CFLAGS	= -O6 -ansi $(TYPE) $(ADDONS) #-Wall 
+CFLAGS	= -fcommon -O6 -ansi $(TYPE) $(ADDONS) #-Wall
 # -g -pg
 
 LIBS    = -lm
@@ -57,6 +57,7 @@ OBJECTS 	= $(SOURCES:.c=.o)
 
 ####### Build rules
 
+all: torchlight
 
 torchlight: $(OBJECTS) $(PDDL_PARSER_OBJ)
 	$(CC) -o torchlight $(OBJECTS) $(PDDL_PARSER_OBJ) $(CFLAGS) $(LIBS)

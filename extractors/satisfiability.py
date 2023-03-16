@@ -17,7 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from feature_extractor import FeatureExtractor
+from .feature_extractor import FeatureExtractor
 
 import os
 import sys
@@ -177,7 +177,9 @@ class SATFeatureExtractor(FeatureExtractor):
             cnf_file = "%s/translatedInstance.010.cnf" % (output_directory)
             if os.path.exists(cnf_file) and os.path.isfile(cnf_file):
                 path_to_zilla_extractor = "%s/sat/satzilla/featuresSAT12" % (self.abs_script_directory)
-                zilla_command = [path_to_zilla_extractor, "-base", "-sp", "-dia", "-cl", "-ls", "-lobjois", "translatedInstance.010.cnf", "MpSAT-features.csv"]
+                zilla_command = [path_to_zilla_extractor, "-base", "-sp", "-dia",
+                                 "-cl", "-ls", "-lobjois",
+                                 "translatedInstance.010.cnf", "MpSAT-features.csv"]
 
                 self.execute_command_with_runsolver(zilla_command, output_directory, None)
 
@@ -194,11 +196,11 @@ class SATFeatureExtractor(FeatureExtractor):
                         features.update(sat_features)
 
                         # make sure at least one non-sentinel value, otherwise obviously not successful
-                        for key,value in features.iteritems():
+                        for key,value in features.items():
                             if value != self.sentinel_value:
                                 successful = True
         except Exception as e:
-            print "Exception running the SAT translation: %s" % (str(e))
+            print("Exception running the SAT translation: %s" % (str(e)))
         finally:
             shutil.rmtree(output_directory)
 

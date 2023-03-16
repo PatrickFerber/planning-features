@@ -17,7 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from feature_extractor import FeatureExtractor
+from .feature_extractor import FeatureExtractor
 
 import os
 import sys
@@ -62,11 +62,11 @@ class LPGProbingFeatureExtractor(FeatureExtractor):
                 features.update(probing_features)
 
                 # make sure at least one non-sentinel value, otherwise obviously not successful
-                for key,value in features.iteritems():
+                for key,value in features.items():
                     if value != self.sentinel_value:
                         successful = True
-        except Exception as e:
-            print "Exception running LPG: %s" % (str(e))
+        # except Exception as e:
+        #     print("Exception running LPG: %s" % (str(e)))
         finally:
             shutil.rmtree(output_directory)
 

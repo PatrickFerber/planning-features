@@ -43,13 +43,13 @@ class FeatureExtractor(object):
     '''
     '''
     def extract(self, domain_path, instance_path):
-        print "ERROR: You should have written a new extract() for your feature extractor"
+        print ("ERROR: You should have written a new extract() for your feature extractor")
         return False,{}
 
     '''
     '''
     def default_features(self):
-        print "ERROR: You need to provide default_features for your feature extractor"
+        print ("ERROR: You need to provide default_features for your feature extractor")
         return {}
 
     '''
@@ -73,10 +73,10 @@ class FeatureExtractor(object):
 
             io = Popen(map(str, modified_cmd), shell=False, preexec_fn=os.setpgrp, cwd=temporary_directory, stdin=stdin_file)
             io.wait()
-        except Exception as e:
-            print "ERROR: Exception during feature extraction: %s" % (str(e))
-        except:
-            print "ERROR: Unknown exception during feature extraction!"
+        # except Exception as e:
+        #     print ("ERROR: Exception during feature extraction: %s" % (str(e)))
+        # except:
+        #     print ("ERROR: Unknown exception during feature extraction!")
         finally:
             if stdin_file != None:
                 stdin_file.close()

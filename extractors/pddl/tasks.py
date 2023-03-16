@@ -17,7 +17,7 @@ class Task(object):
         self.task_name = task_name
         self.requirements = requirements
         self.types = types
-	self.constants = constants
+        self.constants = constants
         self.objects = objects
         self.predicates = predicates
         self.functions = functions
@@ -256,7 +256,7 @@ def check_atom_consistency(atom, same_truth_value, other_truth_value, atom_is_tr
         if not atom_is_true:
             atom = atom.negate()
         print("Warning: %s is specified twice in initial state specification" % atom)
-    
+
 
 def check_for_duplicates(elements, errmsg, finalmsg):
     seen = set()

@@ -19,7 +19,7 @@
 
 import os
 import sys
-from feature_extractor import FeatureExtractor
+from .feature_extractor import FeatureExtractor
 from subprocess import Popen, PIPE
 import shutil
 import re
@@ -198,12 +198,12 @@ class SASFeatureExtractor(FeatureExtractor):
                             features.update(sas_graph_features)
 
                     # make sure at least one non-sentinel value, otherwise obviously not successful
-                    for key,value in features.iteritems():
+                    for key,value in features.items():
                         if value != self.sentinel_value:
                             successful = True
 
         except Exception as e:
-            print "Exception in parse: %s" % (str(e))
+            print("Exception in parse: %s" % (str(e)))
         finally:
             self.sas_representation_dir = output_directory
 
@@ -211,7 +211,8 @@ class SASFeatureExtractor(FeatureExtractor):
 
     def extract_stdout_features(self, output):
         stdout_features = {}
-
+        with open("asdf.out", "w") as f:
+            f.write(output)
         sas_rules_match = re.search("Generated ([0-9]*) rules\.", output)
         sas_relevant_atoms_match = re.search("([0-9]*) relevant atoms", output)
         sas_auxiliary_atoms_match = re.search("([0-9]*) auxiliary atoms", output)
@@ -293,7 +294,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
     def extract_sas_file_features(self, sas_file):
         sas_features = {}
-
+        shutil.copy(sas_file, "/home/ferber/asdf.sas")
         with open(sas_file, 'r') as f:
             # begin_metric
             line = f.readline().lstrip().rstrip()
@@ -332,7 +333,7 @@ class SASFeatureExtractor(FeatureExtractor):
                 # begin_variable
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_variable":
-                    print "ERROR: Expected begin_variable but got %s" % (line)
+                    print("ERROR: Expected begin_variable but got %s" % (line))
                     return sas_features
 
                 variable_name = f.readline().lstrip().rstrip()
@@ -359,7 +360,7 @@ class SASFeatureExtractor(FeatureExtractor):
             for _1 in range(num_mutex_groups):
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_mutex_group":
-                    print "ERROR: Expected begin_mutex_group but got %s" % (line)
+                    print("ERROR: Expected begin_mutex_group but got %s" % (line))
                     return sas_features
 
                 num_entries_in_group = int(f.readline().lstrip().rstrip())
@@ -369,7 +370,7 @@ class SASFeatureExtractor(FeatureExtractor):
                     line = f.readline().lstrip().rstrip()
                     mutex_pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
                     if not mutex_pair_match:
-                        print "ERROR: Poorly formed mutex pair"
+                        print("ERROR: Poorly formed mutex pair")
                         return sas_features
                     else:
                         first = int(mutex_pair_match.group(1))
@@ -385,7 +386,7 @@ class SASFeatureExtractor(FeatureExtractor):
             # begin_state
             line = f.readline().lstrip().rstrip()
             if line != "begin_state":
-                print "ERROR: Expected begin_state but got %s" % (line)
+                print("ERROR: Expected begin_state but got %s" % (line))
                 return sas_features
 
             initial_state = []
@@ -399,7 +400,7 @@ class SASFeatureExtractor(FeatureExtractor):
             # begin_goal
             line = f.readline().lstrip().rstrip()
             if line != "begin_goal":
-                print "ERROR: Expected begin_goal but got %s" % (line)
+                print("ERROR: Expected begin_goal but got %s" % (line))
                 return sas_features
 
             goal_assignments = []
@@ -408,7 +409,7 @@ class SASFeatureExtractor(FeatureExtractor):
                 line = f.readline().lstrip().rstrip()
                 pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
                 if not pair_match:
-                    print "ERROR: Expected goal assignment pair but got %s" % (line)
+                    print("ERROR: Expected goal assignment pair but got %s" % (line))
                     return sas_features
 
                 first = pair_match.group(1)
@@ -423,7 +424,7 @@ class SASFeatureExtractor(FeatureExtractor):
             line = f.readline().lstrip().rstrip()
             num_operators_match = re.search("^([0-9]*)$", line)
             if not num_operators_match:
-                print "ERROR: Expected number of operators but got %s" % (line)
+                print("ERROR: Expected number of operators but got %s" % (line))
                 return sas_features
 
             num_operators = int(num_operators_match.group(1))
@@ -432,7 +433,7 @@ class SASFeatureExtractor(FeatureExtractor):
             for _1 in range(num_operators):
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_operator":
-                    print "ERROR: Expected begin_operator but got %s" % (line)
+                    print("ERROR: Expected begin_operator but got %s" % (line))
                     return sas_features
 
                 operator_name = f.readline().lstrip().rstrip()
@@ -443,7 +444,7 @@ class SASFeatureExtractor(FeatureExtractor):
                     line = f.readline().lstrip().rstrip()
                     pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
                     if not pair_match:
-                        print "ERROR: Expected prevail condition pair but got %s" % (line)
+                        print("ERROR: Expected prevail condition pair but got %s" % (line))
 
                     first = pair_match.group(1)
                     second = pair_match.group(2)
@@ -478,7 +479,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
                 line = f.readline().lstrip().rstrip()
                 if line != "end_operator":
-                    print "ERROR: expected end_operator but got %s" % (line)
+                    print("ERROR: expected end_operator but got %s" % (line))
                     return sas_features
             # end_operator
 
@@ -486,7 +487,7 @@ class SASFeatureExtractor(FeatureExtractor):
             line = f.readline().lstrip().rstrip()
             num_rules_match = re.search("^([0-9]*)$", line)
             if not num_rules_match:
-                print "ERROR: Expected number of axiom rules but got %s" % (line)
+                print("ERROR: Expected number of axiom rules but got %s" % (line))
                 return sas_features
 
             num_axiom_rules = int(num_rules_match.group(1))
@@ -495,7 +496,7 @@ class SASFeatureExtractor(FeatureExtractor):
             for _1 in range(num_axiom_rules):
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_rule":
-                    print "ERROR: Expected begin_rule but got %s" % (line)
+                    print("ERROR: Expected begin_rule but got %s" % (line))
                     return sas_features
 
                 num_conditions = int(f.readline().lstrip().rstrip())
@@ -504,7 +505,7 @@ class SASFeatureExtractor(FeatureExtractor):
                     line = f.readline().lstrip().rstrip()
                     pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
                     if not pair_match:
-                        print "ERROR: Expected condition pair but got %s" % (line)
+                        print("ERROR: Expected condition pair but got %s" % (line))
                         return sas_features
 
                     first = pair_match.group(1)
@@ -515,7 +516,7 @@ class SASFeatureExtractor(FeatureExtractor):
                 line = f.readline().lstrip().rstrip()
                 triplet_match = re.search("^([0-9]*) ([0-9]*) ([0-9]*)$", line)
                 if not triplet_match:
-                    print "ERROR: Expected final rule triplet but got %s" % (line)
+                    print("ERROR: Expected final rule triplet but got %s" % (line))
                     return sas_features
 
                 effected_variable = int(triplet_match.group(1))
@@ -526,7 +527,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
                 line = f.readline().lstrip().rstrip()
                 if line != "end_rule":
-                    print "ERROR: Expected end_rule but got %s" % (line)
+                    print("ERROR: Expected end_rule but got %s" % (line))
             # end_rule
 
             # variable features
@@ -684,14 +685,14 @@ class SASFeatureExtractor(FeatureExtractor):
             # begin_version
             line = f.readline().lstrip().rstrip()
             if line != "begin_version":
-                print "ERROR: Expected begin_version but got %s" % (line)
+                print("ERROR: Expected begin_version but got %s" % (line))
                 return sas_graph_features
 
             version = int(f.readline().lstrip().rstrip())
 
             line = f.readline().lstrip().rstrip()
             if line != "end_version":
-                print "ERROR: Expected end_version but got %s" % (line)
+                print("ERROR: Expected end_version but got %s" % (line))
                 return sas_graph_features
 
             # end_version
@@ -699,14 +700,14 @@ class SASFeatureExtractor(FeatureExtractor):
             # begin_metric
             line = f.readline().lstrip().rstrip()
             if line != "begin_metric":
-                print "ERROR: Expected begin_metric but got %s" % (line)
+                print("ERROR: Expected begin_metric but got %s" % (line))
                 return sas_graph_features
 
             metric = int(f.readline().lstrip().rstrip())
 
             line = f.readline().lstrip().rstrip()
             if line != "end_metric":
-                print "ERROR: Expected end_metric but got %s" % (line)
+                print("ERROR: Expected end_metric but got %s" % (line))
                 return sas_graph_features
 
             # end_metric
@@ -715,7 +716,7 @@ class SASFeatureExtractor(FeatureExtractor):
             line = f.readline().lstrip().rstrip()
             num_variables_match = re.search("^([0-9]*)$", line)
             if not num_variables_match:
-                print "ERROR: Expected number of variables but got %s" % (line)
+                print("ERROR: Expected number of variables but got %s" % (line))
                 return sas_graph_features
 
             num_variables = int(num_variables_match.group(1))
@@ -724,7 +725,7 @@ class SASFeatureExtractor(FeatureExtractor):
             for _1 in range(num_variables):
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_variable":
-                    print "ERROR: Expected begin_variable but got %s" % (line)
+                    print("ERROR: Expected begin_variable but got %s" % (line))
                     return sas_graph_features
 
                 variable_name = f.readline().lstrip().rstrip()
@@ -739,7 +740,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
                 line = f.readline().lstrip().rstrip()
                 if line != "end_variable":
-                    print "ERROR: Expected end_variable but got %s" % (line)
+                    print("ERROR: Expected end_variable but got %s" % (line))
                     return sas_graph_features
 
             # end of variables
@@ -748,7 +749,7 @@ class SASFeatureExtractor(FeatureExtractor):
             line = f.readline().lstrip().rstrip()
             num_groups_match = re.search("^([0-9]*)$", line)
             if not num_groups_match:
-                print "ERROR: Expected number of mutex groups but got %s" % (line)
+                print("ERROR: Expected number of mutex groups but got %s" % (line))
                 return sas_graph_features
 
             num_mutex_groups = int(num_groups_match.group(1))
@@ -757,7 +758,7 @@ class SASFeatureExtractor(FeatureExtractor):
             for _1 in range(num_mutex_groups):
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_mutex_group":
-                    print "ERROR: Expected begin_mutex_group but got %s" % (line)
+                    print("ERROR: Expected begin_mutex_group but got %s" % (line))
                     return sas_graph_features
 
                 num_entries_in_group = int(f.readline().lstrip().rstrip())
@@ -768,7 +769,7 @@ class SASFeatureExtractor(FeatureExtractor):
                     pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
 
                     if not pair_match:
-                        print "ERROR: Expected mutex group pair but got %s" % (line)
+                        print("ERROR: Expected mutex group pair but got %s" % (line))
                         return sas_graph_features
 
                     first = int(pair_match.group(1))
@@ -780,7 +781,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
                 line = f.readline().lstrip().rstrip()
                 if line != "end_mutex_group":
-                    print "ERROR: Expected end_mutex_group but got %s" % (line)
+                    print("ERROR: Expected end_mutex_group but got %s" % (line))
                     return sas_graph_features
 
             # end of mutex groups
@@ -788,7 +789,7 @@ class SASFeatureExtractor(FeatureExtractor):
             # initial state
             line = f.readline().lstrip().rstrip()
             if line != "begin_state":
-                print "ERROR: Expected begin_state but got %s" % (line)
+                print("ERROR: Expected begin_state but got %s" % (line))
                 return sas_graph_features
 
             initial_state = []
@@ -798,7 +799,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
             line = f.readline().lstrip().rstrip()
             if line != "end_state":
-                print "ERROR: Expected end_state but got %s" % (line)
+                print("ERROR: Expected end_state but got %s" % (line))
                 return sas_graph_features
 
             # end_state
@@ -806,7 +807,7 @@ class SASFeatureExtractor(FeatureExtractor):
             # goal state
             line = f.readline().lstrip().rstrip()
             if line != "begin_goal":
-                print "ERROR: Expected begin_goal but got %s" % (line)
+                print("ERROR: Expected begin_goal but got %s" % (line))
                 return sas_graph_features
 
             goal_variables_set = set()
@@ -818,7 +819,7 @@ class SASFeatureExtractor(FeatureExtractor):
                 pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
 
                 if not pair_match:
-                    print "ERROR: Expected goal assignment pair but got %s" % (line)
+                    print("ERROR: Expected goal assignment pair but got %s" % (line))
                     return sas_graph_features
 
                 first = int(pair_match.group(1))
@@ -833,7 +834,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
             line = f.readline().lstrip().rstrip()
             if line != "end_goal":
-                print "ERROR: Expected end_goal but got %s" % (line)
+                print("ERROR: Expected end_goal but got %s" % (line))
                 return sas_graph_features
 
             # end_goal
@@ -842,7 +843,7 @@ class SASFeatureExtractor(FeatureExtractor):
             line = f.readline().lstrip().rstrip()
             num_operators_match = re.search("^([0-9]*)$", line)
             if not num_operators_match:
-                print "ERROR: Expected number of operators but got %s" % (line)
+                print("ERROR: Expected number of operators but got %s" % (line))
                 return sas_graph_features
 
             num_operators = int(num_operators_match.group(1))
@@ -851,7 +852,7 @@ class SASFeatureExtractor(FeatureExtractor):
             for _1 in range(num_operators):
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_operator":
-                    print "ERROR: Expected begin_operator but got %s" % (line)
+                    print("ERROR: Expected begin_operator but got %s" % (line))
                     return sas_graph_features
 
                 operator_name = f.readline().lstrip().rstrip()
@@ -863,7 +864,7 @@ class SASFeatureExtractor(FeatureExtractor):
                     line = f.readline().lstrip().rstrip()
                     pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
                     if not pair_match:
-                        print "ERROR: Expected prevail condition pair but got %s" % (line)
+                        print("ERROR: Expected prevail condition pair but got %s" % (line))
                         return sas_graph_features
 
                     first = int(pair_match.group(1))
@@ -901,7 +902,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
                 line = f.readline().lstrip().rstrip()
                 if line != "end_operator":
-                    print "ERROR: Expected end_operator but got %s" % (line)
+                    print("ERROR: Expected end_operator but got %s" % (line))
                     return sas_graph_features
 
             # end operators
@@ -910,7 +911,7 @@ class SASFeatureExtractor(FeatureExtractor):
             line = f.readline().lstrip().rstrip()
             num_rules_match = re.search("^([0-9]*)$", line)
             if not num_rules_match:
-                print "ERROR: Expected number of axiom rules but got %s" % (line)
+                print("ERROR: Expected number of axiom rules but got %s" % (line))
                 return sas_graph_features
 
             num_axiom_rules = int(num_rules_match.group(1))
@@ -919,7 +920,7 @@ class SASFeatureExtractor(FeatureExtractor):
             for _1 in range(num_axiom_rules):
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_rule":
-                    print "ERROR: Expected begin_rule but got %s" % (line)
+                    print("ERROR: Expected begin_rule but got %s" % (line))
                     return sas_graph_features
 
                 num_conditions = int(f.readline().lstrip().rstrip())
@@ -930,7 +931,7 @@ class SASFeatureExtractor(FeatureExtractor):
                     line = f.readline().lstrip().rstrip()
                     pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
                     if not pair_match:
-                        print "ERROR: Expected condition pair but got %s" % (line)
+                        print("ERROR: Expected condition pair but got %s" % (line))
                         return sas_graph_features
 
                     first = int(pair_match.group(1))
@@ -941,7 +942,7 @@ class SASFeatureExtractor(FeatureExtractor):
                 line = f.readline().lstrip().rstrip()
                 triplet_match = re.search("^([0-9]*) ([0-9]*) ([0-9]*)$", line)
                 if not triplet_match:
-                    print "ERROR: Expected final rule triplet but got %s" % (line)
+                    print("ERROR: Expected final rule triplet but got %s" % (line))
                     return sas_graph_features
 
                 effected_variable = int(triplet_match.group(1))
@@ -952,7 +953,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
                 line = f.readline().lstrip().rstrip()
                 if line != "end_rule":
-                    print "ERROR: Expected end_rule but got %s" % (line)
+                    print("ERROR: Expected end_rule but got %s" % (line))
                     return sas_graph_features
 
             # end axiom rules
@@ -960,7 +961,7 @@ class SASFeatureExtractor(FeatureExtractor):
             # SG
             line = f.readline().lstrip().rstrip()
             if line != "begin_SG":
-                print "ERROR: Expected begin_SG but got %s" % (line)
+                print("ERROR: Expected begin_SG but got %s" % (line))
                 return sas_graph_features
 
             line = f.readline().lstrip().rstrip()
@@ -973,7 +974,7 @@ class SASFeatureExtractor(FeatureExtractor):
             for vindex in range(num_variables):
                 line = f.readline().lstrip().rstrip()
                 if line != "begin_DTG":
-                    print "ERROR: Expected begin_DTG but got %s" % (line)
+                    print("ERROR: Expected begin_DTG but got %s" % (line))
                     return sas_graph_features
 
                 num_edges = 0
@@ -999,7 +1000,7 @@ class SASFeatureExtractor(FeatureExtractor):
                             line = f.readline().lstrip().rstrip()
                             pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
                             if not pair_match:
-                                print "ERROR: DTG %d expected prevail condition <var_index> <value> but got %s" % (vindex, line)
+                                print("ERROR: DTG %d expected prevail condition <var_index> <value> but got %s" % (vindex, line))
                                 return sas_graph_features
 
                         operator = operators[operator_index]
@@ -1024,7 +1025,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
                 line = f.readline().lstrip().rstrip()
                 while line != "end_DTG":
-                    print "ERROR: DTG %d - eating additional line %s" % (vindex, line)
+                    print("ERROR: DTG %d - eating additional line %s" % (vindex, line))
                     line = f.readline().lstrip().rstrip()
             # end DTG
 
@@ -1033,7 +1034,7 @@ class SASFeatureExtractor(FeatureExtractor):
             dtg_total_number_of_edges = 0.0
             dtg_sum_of_edge_weights = 0.0
 
-            for vindex,value in dtg_per_variable.iteritems():
+            for vindex,value in dtg_per_variable.items():
                 dtg_total_number_of_vertices += len(value[2])
                 dtg_total_number_of_edges += len(value[0])
                 dtg_sum_of_edge_weights += value[3]
@@ -1056,7 +1057,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
             dtg_total_vertices = 0.0
 
-            for vindex,value in dtg_per_variable.iteritems():
+            for vindex,value in dtg_per_variable.items():
                 edges = value[0]
                 incoming = value[1]
                 outgoing = value[2]
@@ -1064,7 +1065,7 @@ class SASFeatureExtractor(FeatureExtractor):
                 dtg_total_vertices += len(outgoing)
 
                 sum_of_incoming_edge_weights = 0.0
-                for val_index,inc_edges in incoming.iteritems():
+                for val_index,inc_edges in incoming.items():
                     num_incoming = len(inc_edges)
 
                     inc_weights = 0.0
@@ -1082,7 +1083,7 @@ class SASFeatureExtractor(FeatureExtractor):
                         dtg_max_incoming_edge_weight_sum_per_vertex = inc_weights
 
                 sum_of_outgoing_edge_weights = 0.0
-                for val_index,out_edges in outgoing.iteritems():
+                for val_index,out_edges in outgoing.items():
                     num_outgoing = len(out_edges)
 
                     out_weights = 0.0
@@ -1114,14 +1115,14 @@ class SASFeatureExtractor(FeatureExtractor):
             dtg_variance_incoming_edge_weight_sum_per_vertex_acc = 0.0
             dtg_variance_outgoing_edge_weight_sum_per_vertex_acc = 0.0
 
-            for variable,value in dtg_per_variable.iteritems():
+            for variable,value in dtg_per_variable.items():
                 edges = value[0]
                 incoming = value[1]
                 outgoing = value[2]
 
                 dtg_total_vertices += len(outgoing)
 
-                for val_index,inc_edges in incoming.iteritems():
+                for val_index,inc_edges in incoming.items():
                     num_incoming = len(inc_edges)
 
                     inc_weights = 0.0
@@ -1136,7 +1137,7 @@ class SASFeatureExtractor(FeatureExtractor):
                     dtg_variance_incoming_edge_weight_sum_per_vertex_acc += bar*bar
 
                 sum_of_outgoing_edge_weights = 0.0
-                for val_index,out_edges in outgoing.iteritems():
+                for val_index,out_edges in outgoing.items():
                     num_outgoing = len(out_edges)
 
                     out_weights = 0.0
@@ -1187,7 +1188,7 @@ class SASFeatureExtractor(FeatureExtractor):
             # CG
             line = f.readline().lstrip().rstrip()
             if line != "begin_CG":
-                print "ERROR: Expected begin_CG but got %s" % (line)
+                print("ERROR: Expected begin_CG but got %s" % (line))
                 return sas_graph_features
 
             cg_num_edges = 0
@@ -1206,7 +1207,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
                     pair_match = re.search("^([0-9]*) ([0-9]*)$", line)
                     if not pair_match:
-                        print "ERROR: Expected <var_index> <weight> pair but got %s" % (line)
+                        print("ERROR: Expected <var_index> <weight> pair but got %s" % (line))
                         return sas_graph_features
 
                     first = int(pair_match.group(1))
@@ -1226,7 +1227,7 @@ class SASFeatureExtractor(FeatureExtractor):
 
             line = f.readline().lstrip().rstrip()
             if line != "end_CG":
-                print "ERROR: Expected end_CG but got %s" % (line)
+                print("ERROR: Expected end_CG but got %s" % (line))
                 return sas_graph_features
 
             # end CG

@@ -107,7 +107,6 @@
 State lcurrent_goals;
 
 
-
 /* fixpoint
  */
 int *lF;

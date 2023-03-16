@@ -17,7 +17,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
-from feature_extractor import FeatureExtractor
+from .feature_extractor import FeatureExtractor
 
 import os
 import sys
@@ -63,6 +63,7 @@ class FDProbingFeatureExtractor(FeatureExtractor):
         fd_command = [path_to_fd, "ipc", "seq-sat-lama-2011"]
 
         successful = False
+        output_directory = None
         try:
             sas_path = "%s/output" % self.sas_representation_dir
 
@@ -76,15 +77,16 @@ class FDProbingFeatureExtractor(FeatureExtractor):
                     features.update(probing_features)
 
                     # make sure at least one non-sentinel value, otherwise obviously not successful
-                    for key,value in features.iteritems():
+                    for key,value in features.items():
                         if value != self.sentinel_value:
                             successful = True
             else:
-                print "ERROR: %s doesn't exist!!" % sas_path
+                print("ERROR: %s doesn't exist!!" % sas_path)
         except Exception as e:
-            print "Exception running FD: %s" % (str(e))
+            print("Exception running FD: %s" % (str(e)))
         finally:
-            shutil.rmtree(output_directory)
+            if output_directory is not None and os.path.isdir(output_directory):
+                shutil.rmtree(output_directory)
 
         return successful,features
 

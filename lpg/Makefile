@@ -5,7 +5,7 @@
 
 ####### FLAGS
 
-CFLAGS 	= -g -DNDEBUG -D__TEST__
+CFLAGS 	= -fcommon -g -DNDEBUG -D__TEST__
 
 
 LIBS    = -lm  
